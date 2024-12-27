@@ -566,10 +566,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   santaPaws: {fileID: 839528244}
   moveSpeed: 2
-  requiredShapes:
-  - HorizontalLine
-  - VerticalLine
-  - VerticalLine
+  requiredShapes: 000000000100000001000000
   iconContainer: {fileID: 614098467}
   iconPrefab: {fileID: 1619700307056419907, guid: f3c64d0474122774cbbafd0b75b74f92, type: 3}
   iconSpacing: 0.5
@@ -980,10 +977,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   santaPaws: {fileID: 839528244}
   moveSpeed: 2
-  requiredShapes:
-  - HorizontalLine
-  - VerticalLine
-  - DiagonalLine
+  requiredShapes: 000000000100000002000000
   iconContainer: {fileID: 735182191}
   iconPrefab: {fileID: 1619700307056419907, guid: f3c64d0474122774cbbafd0b75b74f92, type: 3}
   iconSpacing: 0.5

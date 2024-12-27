@@ -2,6 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ShapeType
+{
+    HorizontalLine,
+    VerticalLine,
+    DiagonalLine,
+    V
+}
+
 public class Enemy : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -9,35 +17,33 @@ public class Enemy : MonoBehaviour
     public float moveSpeed = 2f;
 
     [Header("Required Shapes (in order)")]
-    public List<string> requiredShapes; // e.g. ["HorizontalLine", "V", "Line"]
+    public List<ShapeType> requiredShapes;
 
     [Header("Icons Above Head")]
-    public Transform iconContainer;      // Assign your IconContainer in the Inspector
-    public GameObject iconPrefab;        // The ShapeIcon prefab
-    public float iconSpacing = 0.5f;     // Horizontal spacing between icons
+    public Transform iconContainer;
+    public GameObject iconPrefab;
+    public float iconSpacing = 0.5f;
 
-    // Sprites for each shape name
+    [Header("Shape Sprites")]
     public Sprite horizontalLineSprite;
     public Sprite verticalLineSprite;
     public Sprite diagonalLineSprite;
     public Sprite vShapeSprite;
-    // ... add more if needed
 
     void OnEnable()
     {
-        // Subscribe to shape-drawn event
+        // subscribe to shape-drawn event
         ShapeDetector.OnAnyShapeDrawn += OnShapeDrawn;
     }
 
     void OnDisable()
     {
-        // Unsubscribe
+        // unsubscribe
         ShapeDetector.OnAnyShapeDrawn -= OnShapeDrawn;
     }
 
     void Start()
     {
-        // Build initial icons from the requiredShapes list
         RefreshIcons();
     }
 
@@ -55,21 +61,28 @@ public class Enemy : MonoBehaviour
 
     private void OnShapeDrawn(string shapeName)
     {
-        // If we have no shapes left, do nothing
+        // if we have no shapes left, do nothing
         if (requiredShapes.Count == 0) return;
 
-        // Compare drawn shape to the FIRST shape in our list
-        string nextRequired = requiredShapes[0];
-        if (shapeName == nextRequired)
+        // convert the detected shape string to an enum (if possible)
+        ShapeType? detected = ConvertToShapeType(shapeName);
+        if (detected == null)
         {
-            // If correct, remove it
+            // e.g. shapeName didn't match anything in the enum
+            Debug.Log($"Enemy {name}: Received unknown shapeName '{shapeName}'.");
+            return;
+        }
+
+        // compare with the first shape in requiredShapes
+        ShapeType nextRequired = requiredShapes[0];
+        if (detected.Value == nextRequired)
+        {
             requiredShapes.RemoveAt(0);
             Debug.Log($"Enemy {name}: Correct shape {shapeName}! Removing from list.");
 
-            // Rebuild icons to reflect the new list
             RefreshIcons();
 
-            // If none left, destroy self
+            // if none left, destroy self
             if (requiredShapes.Count == 0)
             {
                 Debug.Log($"Enemy {name}: All shapes done. Enemy defeated!");
@@ -83,59 +96,64 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Destroys old icons and re-builds the icon row above the enemy’s head.
+    /// helper to convert shapeName strings from ShapeDetector to enum values.
+    /// returns null if no match found.
+    /// </summary>
+    private ShapeType? ConvertToShapeType(string shapeName)
+    {
+        switch (shapeName)
+        {
+            case "HorizontalLine": return ShapeType.HorizontalLine;
+            case "VerticalLine": return ShapeType.VerticalLine;
+            case "DiagonalLine": return ShapeType.DiagonalLine;
+            case "V": return ShapeType.V;
+            // Add more if needed
+            default: return null;
+        }
+    }
+
+    /// <summary>
+    /// destroys old icons and re-builds the icon row above the enemy’s head.
     /// </summary>
     private void RefreshIcons()
     {
-        // 1) Destroy old children in iconContainer
         for (int i = iconContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(iconContainer.GetChild(i).gameObject);
         }
-
-        // 2) If no shapes, nothing to show
         if (requiredShapes.Count == 0) return;
 
-        // 3) Calculate total width
         int n = requiredShapes.Count;
-        float totalWidth = (n - 1) * iconSpacing;  // e.g. 2 shapes => 1 gap
+        float totalWidth = (n - 1) * iconSpacing;
 
-        // 4) Create each icon and position them
         for (int i = 0; i < n; i++)
         {
-            // Which shape are we showing?
-            string shape = requiredShapes[i];
+            ShapeType shape = requiredShapes[i];
 
-            // Instantiate the iconPrefab as a child of iconContainer
             GameObject iconGO = Instantiate(iconPrefab, iconContainer);
 
-            // Center them around x=0. So the leftmost shape is at -totalWidth/2
             float xPos = -totalWidth * 0.5f + (i * iconSpacing);
             iconGO.transform.localPosition = new Vector3(xPos, 0f, 0f);
 
-            // Optional: If your iconPrefab has a SpriteRenderer, set the sprite
             var sr = iconGO.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
                 sr.sprite = GetSpriteForShape(shape);
             }
-
-            // You could add more fancy stuff here (scale, rotation, etc.)
         }
     }
 
     /// <summary>
-    /// Returns the correct sprite for a given shape name.
+    /// returns the correct sprite for a given shape type.
     /// </summary>
-    private Sprite GetSpriteForShape(string shape)
+    private Sprite GetSpriteForShape(ShapeType shape)
     {
         switch (shape)
         {
-            case "HorizontalLine": return horizontalLineSprite;
-            case "VerticalLine": return verticalLineSprite;
-            case "DiagonalLine": return diagonalLineSprite;
-            case "V": return vShapeSprite;
-            // Add more if needed
+            case ShapeType.HorizontalLine: return horizontalLineSprite;
+            case ShapeType.VerticalLine: return verticalLineSprite;
+            case ShapeType.DiagonalLine: return diagonalLineSprite;
+            case ShapeType.V: return vShapeSprite;
             default: return null;
         }
     }
