@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [RequireComponent(typeof(LineRenderer))]
 public class ShapeDetector : MonoBehaviour
 {
-    public Material lineMaterial;
+    // static event for enemies to listen out for
+    public static event Action<string> OnAnyShapeDrawn;
 
-    // How "strict" you want to be for the distance-based line check
+    public Material lineMaterial;
     public float lineAllowedDeviation = 0.2f;
 
     private List<Vector2> drawnPoints = new List<Vector2>();
@@ -72,18 +74,22 @@ public class ShapeDetector : MonoBehaviour
         if (IsHorizontalLine(points2D))
         {
             Debug.Log("You drew a HORIZONTAL line!");
+            OnAnyShapeDrawn?.Invoke("HorizontalLine");
         }
         else if (IsVerticalLine(points2D))
         {
             Debug.Log("You drew a VERTICAL line!");
+            OnAnyShapeDrawn?.Invoke("VerticalLine");
         }
-        else if (IsLine(points2D))  // Any other angled line
+        else if (IsLine(points2D))
         {
             Debug.Log("You drew a LINE (generic)!");
+            OnAnyShapeDrawn?.Invoke("Line");
         }
         else if (IsVShape(points2D))
         {
             Debug.Log("You drew a V!");
+            OnAnyShapeDrawn?.Invoke("V");
         }
         else
         {
