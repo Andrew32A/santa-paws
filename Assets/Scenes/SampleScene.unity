@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 1139430395}
   - component: {fileID: 1139430396}
   m_Layer: 0
-  m_Name: Main
+  m_Name: ShapeDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
