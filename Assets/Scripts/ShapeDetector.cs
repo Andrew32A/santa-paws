@@ -83,8 +83,8 @@ public class ShapeDetector : MonoBehaviour
         }
         else if (IsLine(points2D))
         {
-            Debug.Log("You drew a LINE (generic)!");
-            OnAnyShapeDrawn?.Invoke("Line");
+            Debug.Log("You drew a Diagonal LINE (generic)!");
+            OnAnyShapeDrawn?.Invoke("DiagonalLine");
         }
         else if (IsVShape(points2D))
         {
