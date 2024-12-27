@@ -3,6 +3,6 @@
 # TODO:
 
 - [ ] Add V shape
-- [ ] Add verticle vs horizontal lines
+- [x] Add verticle vs horizontal lines
 - [ ] Add custom cursor
 - [ ] Add sprites

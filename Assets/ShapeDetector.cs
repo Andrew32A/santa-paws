@@ -4,78 +4,53 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LineRenderer))]
 public class ShapeDetector : MonoBehaviour
 {
-    // Assign this in the Inspector with a simple material (e.g. Default-Line).
     public Material lineMaterial;
 
-    public double lineAllowedDeviation = 0.2; // how "strict" you want to be
+    // How "strict" you want to be for the distance-based line check
+    public float lineAllowedDeviation = 0.2f;
 
-    // We'll keep track of all the drawing points here.
     private List<Vector2> drawnPoints = new List<Vector2>();
-
-    // Reference to the LineRenderer we’ll use to visualize the drawing.
     private LineRenderer lineRenderer;
 
     void Start()
     {
-        // Grab or add a LineRenderer component (because of [RequireComponent]).
         lineRenderer = GetComponent<LineRenderer>();
-
-        // Set some defaults for how we want our line to look.
-        // Adjust these to suit your style (thickness, color, etc.).
         lineRenderer.material = lineMaterial;
         lineRenderer.startWidth = 0.05f;
         lineRenderer.endWidth = 0.05f;
-        lineRenderer.positionCount = 0;    // No points yet
-        lineRenderer.useWorldSpace = true; // We'll feed it world positions
+        lineRenderer.positionCount = 0;
+        lineRenderer.useWorldSpace = true;
     }
 
     void Update()
     {
-        // Detect when the player STARTS drawing:
         if (Input.GetMouseButtonDown(0))
         {
-            // Clear any old points
             drawnPoints.Clear();
-
-            // Reset line positions
             lineRenderer.positionCount = 0;
         }
 
-        // WHILE the player is drawing (mouse held down):
         if (Input.GetMouseButton(0))
         {
-            // Get the current mouse position in screen space
             Vector3 screenPosition = Input.mousePosition;
-
-            // Convert screen space to world space
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
-
-            // We only really need (x, y) in 2D, but we'll keep z=0 for the line
-            // so it’s visible in the scene.
             Vector3 drawPoint = new Vector3(worldPosition.x, worldPosition.y, 0f);
 
-            // Only add the point if it's not too close to the last point,
-            // to avoid extra jitter. But for simplicity, let's add every frame.
             drawnPoints.Add(drawPoint);
 
-            // Update the LineRenderer to show all our points:
             lineRenderer.positionCount = drawnPoints.Count;
             for (int i = 0; i < drawnPoints.Count; i++)
             {
-                // Convert our Vector2/Vector3 to line positions
                 lineRenderer.SetPosition(i, drawnPoints[i]);
             }
         }
 
-        // Detect when the player STOPS drawing:
         if (Input.GetMouseButtonUp(0))
         {
-            // Now that we've finished drawing, let's check the shape:
             DetectShape();
         }
     }
 
-    // This function tries to figure out what shape was drawn
     void DetectShape()
     {
         if (drawnPoints.Count < 2)
@@ -84,15 +59,27 @@ public class ShapeDetector : MonoBehaviour
             return;
         }
 
-        // Convert our Vector3 points to Vector2 for shape checks
+        // Convert Vector3 -> Vector2
         List<Vector2> points2D = new List<Vector2>();
         foreach (var p in drawnPoints)
-            points2D.Add(new Vector2(p.x, p.y));
-
-        // We can do different checks here (line, V, etc.)
-        if (IsLine(points2D))
         {
-            Debug.Log("You drew a LINE!");
+            points2D.Add(new Vector2(p.x, p.y));
+        }
+
+        // ORDER: Horizontal -> Vertical -> Generic line -> "V"
+        // may need to adjust order of operations in future
+
+        if (IsHorizontalLine(points2D))
+        {
+            Debug.Log("You drew a HORIZONTAL line!");
+        }
+        else if (IsVerticalLine(points2D))
+        {
+            Debug.Log("You drew a VERTICAL line!");
+        }
+        else if (IsLine(points2D))  // Any other angled line
+        {
+            Debug.Log("You drew a LINE (generic)!");
         }
         else if (IsVShape(points2D))
         {
@@ -104,21 +91,17 @@ public class ShapeDetector : MonoBehaviour
         }
     }
 
-    // Example: Check if the points form (approximately) a straight line
+    // 1) Distance-based check to confirm it's a fairly straight line
     bool IsLine(List<Vector2> points)
     {
-        // If the user drew fewer than 2 points, we can't form a line
-        if (points.Count < 2)
-            return false;
+        if (points.Count < 2) return false;
 
         Vector2 startPoint = points[0];
         Vector2 endPoint = points[points.Count - 1];
 
-        // If start and end are effectively the same, can’t form a line
         if ((endPoint - startPoint).sqrMagnitude < Mathf.Epsilon)
             return false;
 
-        // Check the distance of each intermediate point from the line segment
         for (int i = 1; i < points.Count - 1; i++)
         {
             float distance = DistanceFromLineSegment(points[i], startPoint, endPoint);
@@ -127,40 +110,61 @@ public class ShapeDetector : MonoBehaviour
                 return false;
             }
         }
-
-        // If no point was too far off, it's (probably) a line
         return true;
     }
 
-    // Helper function: distance from a point to a line segment
-    float DistanceFromLineSegment(Vector2 point, Vector2 segStart, Vector2 segEnd)
+    // 2) Horizontal line? Check angle vs. X-axis
+    bool IsHorizontalLine(List<Vector2> points)
     {
-        // Length squared of the segment
-        float lineLengthSq = (segEnd - segStart).sqrMagnitude;
-        if (lineLengthSq < Mathf.Epsilon)
+        // Must first pass the "IsLine" test so we know it's not too wiggly
+        if (!IsLine(points)) return false;
+
+        Vector2 startPoint = points[0];
+        Vector2 endPoint = points[points.Count - 1];
+
+        Vector2 direction = (endPoint - startPoint).normalized;
+
+        // Angle with the X-axis is how "horizontal" it is
+        float angleFromX = Vector2.Angle(direction, Vector2.right);
+
+        // If it's less than, say, 10° from the X-axis or close to 180°, call it horizontal
+        // Adjust angleThreshold up/down to taste
+        float angleThreshold = 10f;
+        if (angleFromX <= angleThreshold || angleFromX >= 180f - angleThreshold)
         {
-            // Degenerate line: start and end are basically the same
-            return Vector2.Distance(point, segStart);
+            return true;
         }
-
-        // Project 'point' onto the line [segStart->segEnd], clamped to [0..1]
-        float t = Vector2.Dot(point - segStart, segEnd - segStart) / lineLengthSq;
-        t = Mathf.Clamp01(t);
-
-        // Find the projection point on the segment
-        Vector2 projection = segStart + t * (segEnd - segStart);
-
-        // Distance between the actual point and the projected point
-        return Vector2.Distance(point, projection);
+        return false;
     }
 
+    // 3) Vertical line? Check angle vs. Y-axis
+    bool IsVerticalLine(List<Vector2> points)
+    {
+        // Must first pass the "IsLine" test so we know it's not too wiggly
+        if (!IsLine(points)) return false;
 
-    // Example: Check if the points form a "V" (one sharp turn)
+        Vector2 startPoint = points[0];
+        Vector2 endPoint = points[points.Count - 1];
+
+        Vector2 direction = (endPoint - startPoint).normalized;
+
+        // Angle with the Y-axis
+        float angleFromY = Vector2.Angle(direction, Vector2.up);
+
+        // If it's less than ~10° from the Y-axis or close to 180°, call it vertical
+        float angleThreshold = 10f;
+        if (angleFromY <= angleThreshold || angleFromY >= 180f - angleThreshold)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // 4) One sharp corner => "V"
     bool IsVShape(List<Vector2> points)
     {
         int cornerCount = 0;
 
-        // More forgiving angles:
         float minAngle = 20f;
         float maxAngle = 160f;
 
@@ -182,7 +186,22 @@ public class ShapeDetector : MonoBehaviour
                     return false;
             }
         }
-
         return (cornerCount == 1);
+    }
+
+    // Distance from a point to a line segment
+    float DistanceFromLineSegment(Vector2 point, Vector2 segStart, Vector2 segEnd)
+    {
+        float lineLengthSq = (segEnd - segStart).sqrMagnitude;
+        if (lineLengthSq < Mathf.Epsilon)
+        {
+            return Vector2.Distance(point, segStart);
+        }
+
+        float t = Vector2.Dot(point - segStart, segEnd - segStart) / lineLengthSq;
+        t = Mathf.Clamp01(t);
+
+        Vector2 projection = segStart + t * (segEnd - segStart);
+        return Vector2.Distance(point, projection);
     }
 }
