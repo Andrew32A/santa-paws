@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1b9871316b3044aa982846bf1a3676, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  santaPaws: {fileID: 0}
+  santaPaws: {fileID: 1691310081619470058, guid: f622d1a9d417f1f4aa89db20d4b833b7, type: 3}
   moveSpeed: 2
   requiredShapes: 00000000
   iconContainer: {fileID: 1577714582582030702}
