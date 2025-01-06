@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SantaPaws : MonoBehaviour
 {
+    [Header("Health")]
+    public List<GameObject> heartContainersList;
     public int maxHealth = 4;
     public int currentHealth;
 
@@ -22,6 +24,8 @@ public class SantaPaws : MonoBehaviour
         Debug.Log("Trigger");
         if (other.gameObject.tag == "Enemy")
         {
+            // delete last heart container in list
+            Destroy(heartContainersList[heartContainersList.Count - 1]);
             TakeDamage(1);
 
             // reset combo when player takes damage
