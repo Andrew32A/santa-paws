@@ -16,7 +16,6 @@ public class SantaPaws : MonoBehaviour
 
     void Update()
     {
-
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -24,14 +23,20 @@ public class SantaPaws : MonoBehaviour
         Debug.Log("Trigger");
         if (other.gameObject.tag == "Enemy")
         {
-            // delete last heart container in list
-            Destroy(heartContainersList[heartContainersList.Count - 1]);
+            // destroy the last heart container GameObject
+            int lastIndex = heartContainersList.Count - 1;
+            Destroy(heartContainersList[lastIndex]);
+
+            // remove it from the list so the next damage will remove the *new* last heart
+            heartContainersList.RemoveAt(lastIndex);
+
+            // take damage
             TakeDamage(1);
 
             // reset combo when player takes damage
             ScoreManager.Instance.ResetCombo();
 
-            // destroy enemy, player doesnt get points
+            // destroy enemy (player doesn't get points)
             Destroy(other.gameObject);
         }
     }
