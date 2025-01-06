@@ -103,7 +103,8 @@ public class Enemy : MonoBehaviour
             if (requiredShapes.Count == 0)
             {
                 Debug.Log($"Enemy {name}: All shapes done. Enemy defeated!");
-                ScoreManager.Instance.AddScore(100);
+                ScoreManager.Instance.IncreaseCombo();
+                ScoreManager.Instance.AddScore(1000);
                 Destroy(gameObject);
             }
         }

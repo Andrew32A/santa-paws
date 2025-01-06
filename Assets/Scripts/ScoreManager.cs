@@ -18,6 +18,10 @@ public class ScoreManager : MonoBehaviour
     public float spawnRotationRange = 15f;
     public float spawnOffsetRange = 50f;
 
+    [Header("Combo")]
+    public TextMeshProUGUI comboText;
+    public float comboMultiplier = 1f;
+
     private void Awake()
     {
         if (Instance == null)
@@ -29,6 +33,7 @@ public class ScoreManager : MonoBehaviour
     void Start()
     {
         UpdateScoreText();
+        UpdateComboText(); // ensure combo text is up to date at start
     }
 
     /// call this whenever an enemy is destroyed or you want to add points
@@ -37,8 +42,11 @@ public class ScoreManager : MonoBehaviour
         // store the old score before adding
         int oldScore = score;
 
+        // calculate how many points to add, factoring in combo
+        int comboScore = Mathf.RoundToInt(amount * comboMultiplier);
+
         // update score
-        score += amount;
+        score += comboScore;
         UpdateScoreText();
 
         // check every value we just "crossed" from oldScore+1 up to new score
@@ -53,6 +61,25 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    /// call this when the player correctly draws a shape to increase combo by +0.2
+    public void IncreaseCombo()
+    {
+        comboMultiplier += 0.2f;
+        UpdateComboText();
+    }
+
+    /// updates the combo TMP text (e.g. "x1.2") 
+    private void UpdateComboText()
+    {
+        if (comboText != null)
+        {
+            comboText.text = "x" + comboMultiplier.ToString("F1");
+        }
+        else
+        {
+            Debug.LogWarning("ScoreManager: No TextMeshProUGUI assigned to comboText!");
+        }
+    }
 
     /// updates the TMP text with leading zeros (e.g. "0000100").
     private void UpdateScoreText()
