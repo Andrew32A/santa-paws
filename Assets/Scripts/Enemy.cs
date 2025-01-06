@@ -12,6 +12,7 @@ public enum ShapeType
 
 public class Enemy : MonoBehaviour
 {
+    // public GameOject SceneManager;
     [Header("Success Sound")]
     public AudioSource audioSource;
     public AudioClip[] successSounds;
@@ -102,6 +103,7 @@ public class Enemy : MonoBehaviour
             if (requiredShapes.Count == 0)
             {
                 Debug.Log($"Enemy {name}: All shapes done. Enemy defeated!");
+                ScoreManager.Instance.AddScore(100);
                 Destroy(gameObject);
             }
         }
