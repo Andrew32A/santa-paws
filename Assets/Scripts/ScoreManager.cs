@@ -81,6 +81,13 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    // reset combo when player gets hit
+    public void ResetCombo()
+    {
+        comboMultiplier = 1f;
+        UpdateComboText();
+    }
+
     /// updates the TMP text with leading zeros (e.g. "0000100").
     private void UpdateScoreText()
     {

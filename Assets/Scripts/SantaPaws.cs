@@ -24,6 +24,9 @@ public class SantaPaws : MonoBehaviour
         {
             TakeDamage(1);
 
+            // reset combo when player takes damage
+            ScoreManager.Instance.ResetCombo();
+
             // destroy enemy, player doesnt get points
             Destroy(other.gameObject);
         }
