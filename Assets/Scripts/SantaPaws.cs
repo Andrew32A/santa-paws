@@ -9,6 +9,9 @@ public class SantaPaws : MonoBehaviour
     public int maxHealth = 4;
     public int currentHealth;
 
+    [Header("Level Loader")]
+    public LevelLoader levelLoader;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -53,5 +56,15 @@ public class SantaPaws : MonoBehaviour
     private void Die()
     {
         Destroy(gameObject);
+
+        // tell LevelLoader to load the next scene
+        if (levelLoader != null)
+        {
+            levelLoader.NextLevel();
+        }
+        else
+        {
+            Debug.LogError("No LevelLoader assigned to SantaPaws!");
+        }
     }
 }

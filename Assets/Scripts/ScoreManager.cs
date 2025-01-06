@@ -25,9 +25,14 @@ public class ScoreManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);  // to carry over score to game over scene
+        }
         else
+        {
             Destroy(gameObject);
+        }
     }
 
     void Start()
