@@ -12,7 +12,12 @@ public enum ShapeType
 
 public class Enemy : MonoBehaviour
 {
-    // public GameOject SceneManager;
+    [Header("Animation")]
+    public Animator animator;
+
+    [Header("Sprite Flip")]
+    public SpriteRenderer enemySpriteRenderer;
+
     [Header("Success Sound")]
     public AudioSource audioSource;
     public AudioClip[] successSounds;
@@ -59,7 +64,7 @@ public class Enemy : MonoBehaviour
         MoveTowardSantaPaws();
     }
 
-    /// resets the static flag once per frame so only one sound can play per frame.
+    // resets the static flag once per frame so only one sound can play per frame.
     void LateUpdate()
     {
         // at the end of the frame, allow a success sound in the next frame again
@@ -71,6 +76,12 @@ public class Enemy : MonoBehaviour
         if (santaPaws == null) return;
         Vector2 direction = (santaPaws.position - transform.position).normalized;
         transform.Translate(direction * moveSpeed * Time.deltaTime);
+
+        if (direction.x < 0)
+            enemySpriteRenderer.flipX = true;
+        else if (direction.x > 0)
+            enemySpriteRenderer.flipX = false;
+
     }
 
     private void OnShapeDrawn(string shapeName)
@@ -94,6 +105,19 @@ public class Enemy : MonoBehaviour
             requiredShapes.RemoveAt(0);
             Debug.Log($"Enemy {name}: Correct shape {shapeName}! Removing from list.");
 
+            // TODO, work in progress to get damage animations
+
+            // animator.SetBool("EnemyTakeDamage", true);
+            // StartCoroutine(ResetDamageAnim());
+
+            // IEnumerator ResetDamageAnim()
+            // {
+            //     // wait a short moment
+            //     yield return new WaitForSeconds(0.1f);
+            //     // then set the bool back to false
+            //     animator.SetBool("EnemyTakeDamage", false);
+            // }
+
             // play a success sound if not already played this frame
             PlaySuccessSoundOncePerFrame();
 
@@ -103,9 +127,21 @@ public class Enemy : MonoBehaviour
             if (requiredShapes.Count == 0)
             {
                 Debug.Log($"Enemy {name}: All shapes done. Enemy defeated!");
+
+                // play death animation
+                animator.SetTrigger("EnemyDieTrigger");
+
+                // increase combo and add score
                 ScoreManager.Instance.IncreaseCombo();
                 ScoreManager.Instance.AddScore(1000);
-                Destroy(gameObject);
+
+                // wait for animation to finish (pretty bad to have this hardcoded, NEED TO FIX LATER)
+                float deathAnimLength = 0.683f;
+
+                // stop following player
+                santaPaws = null;
+
+                Destroy(gameObject, deathAnimLength);
             }
         }
         else

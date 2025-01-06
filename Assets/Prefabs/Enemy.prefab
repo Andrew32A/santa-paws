@@ -109,8 +109,8 @@ Transform:
   m_GameObject: {fileID: 3514258082623641595}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.178, z: 0}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3423280509361566179}
@@ -298,6 +298,7 @@ GameObject:
   - component: {fileID: 2399825372797108095}
   - component: {fileID: 7017859525934125797}
   - component: {fileID: 4011537458739210836}
+  - component: {fileID: 6755443735856300799}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -315,7 +316,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.02, y: -1.66, z: -0.015095937}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 7, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1577714582582030702}
@@ -362,8 +363,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 1384060560, guid: 1b1903a563aa7354ca352e5b763dd50d, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -385,6 +386,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1b9871316b3044aa982846bf1a3676, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 6755443735856300799}
+  enemySpriteRenderer: {fileID: 2399825372797108095}
   audioSource: {fileID: 0}
   successSounds:
   - {fileID: 8300000, guid: 583ebaa72545cd048bb9c547e944c39e, type: 3}
@@ -394,7 +397,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: fe2caa1df11d61b45b6cb49ca91046ec, type: 3}
   santaPaws: {fileID: 0}
   moveSpeed: 2
-  requiredShapes: 00000000
+  requiredShapes: 000000000100000002000000
   iconContainer: {fileID: 1577714582582030702}
   iconPrefab: {fileID: 1619700307056419907, guid: f3c64d0474122774cbbafd0b75b74f92, type: 3}
   iconSpacing: 0.5
@@ -434,16 +437,37 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0010249242, y: -0.016397785}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.32, y: 0.32}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.13296466, y: 0.20060575}
   m_EdgeRadius: 0
+--- !u!95 &6755443735856300799
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9062126658893981037}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 53775159d00156c469ade35f446d8f19, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
