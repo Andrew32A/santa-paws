@@ -23,6 +23,9 @@ public class SantaPaws : MonoBehaviour
         if (other.gameObject.tag == "Enemy")
         {
             TakeDamage(1);
+
+            // destroy enemy, player doesnt get points
+            Destroy(other.gameObject);
         }
     }
 
