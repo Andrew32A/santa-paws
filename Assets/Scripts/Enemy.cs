@@ -12,6 +12,14 @@ public enum ShapeType
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Success Sound")]
+    public AudioSource audioSource;
+    public AudioClip[] successSounds;
+
+    // static flag so only one success sound can play each frame
+    private static bool successSoundPlayedThisFrame = false;
+
+
     [Header("Movement Settings")]
     public Transform santaPaws;
     public float moveSpeed = 2f;
@@ -32,13 +40,11 @@ public class Enemy : MonoBehaviour
 
     void OnEnable()
     {
-        // subscribe to shape-drawn event
         ShapeDetector.OnAnyShapeDrawn += OnShapeDrawn;
     }
 
     void OnDisable()
     {
-        // unsubscribe
         ShapeDetector.OnAnyShapeDrawn -= OnShapeDrawn;
     }
 
@@ -50,6 +56,13 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         MoveTowardSantaPaws();
+    }
+
+    /// resets the static flag once per frame so only one sound can play per frame.
+    void LateUpdate()
+    {
+        // at the end of the frame, allow a success sound in the next frame again
+        successSoundPlayedThisFrame = false;
     }
 
     void MoveTowardSantaPaws()
@@ -80,6 +93,9 @@ public class Enemy : MonoBehaviour
             requiredShapes.RemoveAt(0);
             Debug.Log($"Enemy {name}: Correct shape {shapeName}! Removing from list.");
 
+            // play a success sound if not already played this frame
+            PlaySuccessSoundOncePerFrame();
+
             RefreshIcons();
 
             // if none left, destroy self
@@ -95,10 +111,26 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// helper to convert shapeName strings from ShapeDetector to enum values.
-    /// returns null if no match found.
-    /// </summary>
+    /// plays one random success sound if none has played this frame yet
+    private void PlaySuccessSoundOncePerFrame()
+    {
+        // if a success sound has already been played this frame, do nothing
+        if (successSoundPlayedThisFrame) return;
+
+        successSoundPlayedThisFrame = true;
+
+        if (audioSource != null && successSounds != null && successSounds.Length > 0)
+        {
+            AudioClip clip = successSounds[Random.Range(0, successSounds.Length)];
+            audioSource.PlayOneShot(clip);
+        }
+        else
+        {
+            Debug.LogWarning($"Enemy {name}: No audioSource or no successSounds assigned!");
+        }
+    }
+
+    /// helper to convert shapeName strings from ShapeDetector to enum values
     private ShapeType? ConvertToShapeType(string shapeName)
     {
         switch (shapeName)
@@ -107,14 +139,12 @@ public class Enemy : MonoBehaviour
             case "VerticalLine": return ShapeType.VerticalLine;
             case "DiagonalLine": return ShapeType.DiagonalLine;
             case "V": return ShapeType.V;
-            // Add more if needed
+            // add more if needed
             default: return null;
         }
     }
 
-    /// <summary>
     /// destroys old icons and re-builds the icon row above the enemy’s head.
-    /// </summary>
     private void RefreshIcons()
     {
         for (int i = iconContainer.childCount - 1; i >= 0; i--)
@@ -143,9 +173,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// returns the correct sprite for a given shape type.
-    /// </summary>
     private Sprite GetSpriteForShape(ShapeType shape)
     {
         switch (shape)

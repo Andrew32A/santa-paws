@@ -304,7 +304,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4088618447432010405
 Transform:
   m_ObjectHideFlags: 0
@@ -385,7 +385,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1b9871316b3044aa982846bf1a3676, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  santaPaws: {fileID: 1691310081619470058, guid: f622d1a9d417f1f4aa89db20d4b833b7, type: 3}
+  audioSource: {fileID: 0}
+  successSounds:
+  - {fileID: 8300000, guid: 583ebaa72545cd048bb9c547e944c39e, type: 3}
+  - {fileID: 8300000, guid: beb6b862412a81f46af3b3bc1cc50f43, type: 3}
+  - {fileID: 8300000, guid: 452e197517b12bc4f8de324ae6659b9e, type: 3}
+  - {fileID: 8300000, guid: e5d2b7540fe097f4ca2956262b56b1bb, type: 3}
+  - {fileID: 8300000, guid: fe2caa1df11d61b45b6cb49ca91046ec, type: 3}
+  santaPaws: {fileID: 0}
   moveSpeed: 2
   requiredShapes: 00000000
   iconContainer: {fileID: 1577714582582030702}
