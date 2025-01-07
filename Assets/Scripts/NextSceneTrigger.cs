@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class NextSceneTrigger : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [Header("Level Loader")]
+    public LevelLoader levelLoader;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        levelLoader.NextLevel();
     }
 }
