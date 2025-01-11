@@ -1,6 +1,6 @@
 # Santa Paws: Winter Wizardry
 
-<img src="https://github.com/Andrew32A/santa-paws/tree/main/Assets/Images/gameplay-screenshot.png" align="center">
+<img src="https://github.com/Andrew32A/santa-paws/tree/main/Assets/Images/Screenshots/gameplay-screenshot.png" align="center">
 
 # Description
 
